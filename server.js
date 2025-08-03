@@ -21,32 +21,31 @@ app.use(express.json());
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Разрешаем запросы без origin (от Postman, серверные запросы)
+    // Разрешаем запросы без origin (например, от Postman или серверных запросов)
     if (!origin) {
       return callback(null, true);
     }
-    
-    // Список разрешенных точных адресов
+
     const allowedOrigins = [
-      'http://localhost:3000',
-      'https://vostok-trade-frontend.vercel.app' // Твой главный домен
-    ];
-    
-    // Проверяем, есть ли origin в списке точных адресов
+    'http://localhost:3000',
+    'https://vostok-trade-frontend.vercel.app',
+    'https://vostok-trade-frontend-git-main-doomsdays-projects-4e777191.vercel.app',
+    'https://vostok-trade-frontend-6370dzto2-doomsdays-projects-4e777191.vercel.app' // Добавьте этот домен
+];
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     }
-    // Проверяем, соответствует ли origin шаблону Vercel Preview URL
+
     const vercelPreviewPattern = /^https:\/\/vostok-trade-frontend-.*\.vercel\.app$/;
     if (vercelPreviewPattern.test(origin)) {
       return callback(null, true);
     }
-    
-    // Если origin не совпал ни с одним правилом, запрещаем
+
     return callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 app.use(cors(corsOptions));       // Разрешаем CORS
