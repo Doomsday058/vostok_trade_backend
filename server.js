@@ -16,29 +16,41 @@ import { sendPriceByEmail } from './lib/mailer.js';
 dotenv.config() // Подключаем .env
 await dbConnect();
 
-const allowedOrigins = [
-  'http://localhost:3000', // Для локальной разработки
-  'https://vostok-trade-frontend.vercel.app', // Твой задеплоенный фронтенд
-  "vostok-trade-frontend-git-main-doomsdays-projects-4e777191.vercel.app",
-  "vostok-trade-frontend-6370dzto2-doomsdays-projects-4e777191.vercel.app"
-];
-
+const app = express(); // 1. Инициализируем приложение
+app.use(express.json());
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Разрешаем запросы без origin (от Postman, серверные запросы)
+    if (!origin) {
+      return callback(null, true);
     }
+    
+    // Список разрешенных точных адресов
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://vostok-trade-frontend.vercel.app' // Твой главный домен
+    ];
+    
+    // Проверяем, есть ли origin в списке точных адресов
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+
+    // Проверяем, соответствует ли origin шаблону Vercel Preview URL
+    const vercelPreviewPattern = /^https:\/\/vostok-trade-frontend-.*\.vercel\.app$/;
+    if (vercelPreviewPattern.test(origin)) {
+      return callback(null, true);
+    }
+    
+    // Если origin не совпал ни с одним правилом, запрещаем
+    return callback(new Error('Not allowed by CORS'));
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Важно: добавляем OPTIONS
-  allowedHeaders: ['Content-Type', 'Authorization'] // Разрешаем нужные заголовки
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-const app = express()
 app.use(cors(corsOptions));       // Разрешаем CORS
-app.use(express.json()) // Для парсинга JSON
 
 // Маршрут для получения данных текущего пользователя
 app.get('/api/auth/me', async (req, res) => {
