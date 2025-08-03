@@ -6,8 +6,8 @@ import dbConnect from './lib/db.js';
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import User from './lib/models/User.js';
-import Product from './lib/models/Product.js';
-import PriceRequest from './lib/models/PriceRequest.js';
+import Product from './lib/models/Product.js';   
+import PriceRequest from './lib/models/PriceRequest.js'; 
 import xlsx from 'xlsx'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -16,34 +16,31 @@ import { sendPriceByEmail } from './lib/mailer.js';
 dotenv.config() // Подключаем .env
 await dbConnect();
 
-const app = express(); // Инициализируем приложение здесь
+const allowedOrigins = [
+  'http://localhost:3000', // Для локальной разработки
+  'https://vostok-trade-frontend.vercel.app', // Твой задеплоенный фронтенд
+  "vostok-trade-frontend-git-main-doomsdays-projects-4e777191.vercel.app",
+  "vostok-trade-frontend-6370dzto2-doomsdays-projects-4e777191.vercel.app"
+];
+
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin) {
-      return callback(null, true);
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'https://vostok-trade-frontend.vercel.app' 
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
-    }
-    // Проверяем шаблон Vercel Preview URL
-    const vercelPreviewPattern = /^https:\/\/vostok-trade-frontend-.*\.vercel\.app$/;
-    if (vercelPreviewPattern.test(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Важно: добавляем OPTIONS
+  allowedHeaders: ['Content-Type', 'Authorization'] // Разрешаем нужные заголовки
 };
 
-app.use(cors(corsOptions));
+const app = express()
+app.use(cors(corsOptions));       // Разрешаем CORS
+app.use(express.json()) // Для парсинга JSON
 
-app.use(express.json()); // Для парсинга JSON
-
+// Маршрут для получения данных текущего пользователя
 app.get('/api/auth/me', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]
   if (!token) return res.status(401).json({ message: 'Not authorized' })
@@ -227,7 +224,6 @@ app.get('/api/price-requests', authMiddleware, async (req, res) => {
     });
   }
 });
-
 
 // Запуск сервера
 const PORT = process.env.PORT || 5000
