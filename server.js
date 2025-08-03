@@ -16,8 +16,26 @@ import { sendPriceByEmail } from './lib/mailer.js';
 dotenv.config() // Подключаем .env
 await dbConnect();
 
+const allowedOrigins = [
+  'http://localhost:3000', // Для локальной разработки
+  'https://vostok-trade-frontend.vercel.app' // Твой задеплоенный фронтенд
+];
+
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Важно: добавляем OPTIONS
+  allowedHeaders: ['Content-Type', 'Authorization'] // Разрешаем нужные заголовки
+};
+
 const app = express()
-app.use(cors())        // Разрешаем CORS
+app.use(cors(corsOptions));       // Разрешаем CORS
 app.use(express.json()) // Для парсинга JSON
 
 // Маршрут для получения данных текущего пользователя
