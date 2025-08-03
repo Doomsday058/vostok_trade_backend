@@ -36,7 +36,6 @@ const corsOptions = {
     if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     }
-
     // Проверяем, соответствует ли origin шаблону Vercel Preview URL
     const vercelPreviewPattern = /^https:\/\/vostok-trade-frontend-.*\.vercel\.app$/;
     if (vercelPreviewPattern.test(origin)) {
@@ -51,6 +50,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));       // Разрешаем CORS
+app.options('*', cors(corsOptions)); // Добавьте это для обработки preflight запросов
+
 
 // Маршрут для получения данных текущего пользователя
 app.get('/api/auth/me', async (req, res) => {
