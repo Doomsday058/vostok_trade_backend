@@ -19,6 +19,7 @@ await dbConnect();
 const allowedOrigins = [
   'http://localhost:3000', // Для локальной разработки
   'https://vostok-trade-frontend.vercel.app' // Твой задеплоенный фронтенд
+  'https://vostok-trade-frontend-6370dzto2-doomsdays-projects-4e777191.vercel.app'
 ];
 
 
