@@ -12,45 +12,36 @@ import xlsx from 'xlsx'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { sendPriceByEmail } from './lib/mailer.js';
-
-dotenv.config() // Подключаем .env
+dotenv.config() 
 await dbConnect();
 
-const app = express(); // 1. Инициализируем приложение
+const app = express();
 app.use(express.json());
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Разрешаем запросы без origin (например, от Postman или серверных запросов)
     if (!origin) {
       return callback(null, true);
     }
-
     const allowedOrigins = [
-    'http://localhost:3000',
-    'https://vostok-trade-frontend.vercel.app',
-    'https://vostok-trade-frontend-git-main-doomsdays-projects-4e777191.vercel.app',
-    'https://vostok-trade-frontend-6370dzto2-doomsdays-projects-4e777191.vercel.app' // Добавьте этот домен
-];
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
-    }
-
+      'http://localhost:3000',
+      'https://vostok-trade-frontend.vercel.app',
+      'https://vostok-trade-frontend-git-main-doomsdays-projects-4e777191.vercel.app',
+      'https://vostok-trade-frontend-6370dzto2-doomsdays-projects-4e777191.vercel.app'
+    ];
+    // Паттерн для превью-ссылок Vercel тоже выглядит корректно
     const vercelPreviewPattern = /^https:\/\/vostok-trade-frontend-.*\.vercel\.app$/;
-    if (vercelPreviewPattern.test(origin)) {
+    if (allowedOrigins.indexOf(origin) !== -1 || vercelPreviewPattern.test(origin)) {
       return callback(null, true);
     }
-
     return callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // Рекомендуется добавить для поддержки передачи cookie и заголовков авторизации
 };
 
 app.use(cors(corsOptions));       // Разрешаем CORS
-app.options('*', cors(corsOptions)); // Добавьте это для обработки preflight запросов
-
 
 // Маршрут для получения данных текущего пользователя
 app.get('/api/auth/me', async (req, res) => {
