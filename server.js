@@ -28,8 +28,7 @@ const corsOptions = {
       'https://vostok-trade-frontend.vercel.app',
       'https://vostok-trade-frontend-git-main-doomsdays-projects-4e777191.vercel.app',
       'https://vostok-trade-frontend-6370dzto2-doomsdays-projects-4e777191.vercel.app',
-      'vostok-trade-frontend-git-main-doomsdays-projects-4e777191.vercel.app',
-      'vostok-trade-frontend-git-main-doomsdays-projects-4e777191.vercel.app',
+      'https://vostok-trade-frontend-hhl6rw1dc-doomsdays-projects-4e777191.vercel.app'
     ];
     // Паттерн для превью-ссылок Vercel тоже выглядит корректно
     const vercelPreviewPattern = /^https:\/\/vostok-trade-frontend-.*\.vercel\.app$/;
